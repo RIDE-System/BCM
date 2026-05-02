@@ -9,6 +9,8 @@ BCM::BCM() {
     wheelVel = 0.0f;
     prev_imuAcc = 0.0f;
     prev_wheelVel = 0.0f;
+    servoStep = 10.f;
+    servoPos = 0.0f;
     trueVel = 0.0f;
     lastUpdateTime = millis();
 
@@ -39,12 +41,18 @@ void BCM::process(){
         digitalWrite(SLIP_LED_PIN, HIGH);
 
         //Engage the brake release servo to mitigate slip
-        serv.write(180); // Adjust this value based on your servo's range and
+        servoPos += servoStep;
+        if(servoPos > 180) servoPos = 180;
+
+        serv.write(servoPos); // Adjust this value based on your servo's range and
 
     } else {
 
         // Normal rolling — trust the wheel speed, re-anchor IMU velocity
-       serv.write(0); 
+        servoPos -= servoStep;
+        if(servoPos < 0) servoPos = 0;
+
+        serv.write(servoPos); 
        
         //Turn off slip indicator
         digitalWrite(SLIP_LED_PIN, LOW);

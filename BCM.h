@@ -45,6 +45,10 @@ class BCM {
         //Servo 
         Servo serv;  
 
+        //Servo incremental tracker
+        float servoPos;
+        float servoStep = 10.0f; // degrees per increment
+
         // Wheel Speed
         float wheelVel, wheelAcc;
 
