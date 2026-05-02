@@ -16,9 +16,8 @@ BCM::BCM() {
     pinMode(SLIP_LED_PIN, OUTPUT);
 
     //Setup brake release servo
-    Servo myservo;  
-    myservo.attach(15);
-    myservo.write(0); 
+    serv.attach(15);
+    serv.write(0); 
 
     
 }
@@ -27,25 +26,25 @@ BCM::BCM() {
 void BCM::process(){
 
     // Update IMU velocity estimate by integrating acceleration
-    wheelAcc = (wheelVel - prev_wheelVel) / dt;
+    wheelAcc = (wheelVel - prev_wheelVel) / diff(); // simple numerical differentiation
 
     // Update true velocity
     if(isSlipping()){
 
         //Integrate IMU acceleration to estimate true velocity during slip
-        trueVel += imuAcc * dt;
+        trueVel += imuAcc * diff();
         //trueVel  = max(trueVel, 0.0f);   // velocity cannot go negative
 
         //Turn on slip indicator
         digitalWrite(SLIP_LED_PIN, HIGH);
 
         //Engage the brake release servo to mitigate slip
-        myservo.write(180); // Adjust this value based on your servo's range and
+        serv.write(180); // Adjust this value based on your servo's range and
 
     } else {
 
         // Normal rolling — trust the wheel speed, re-anchor IMU velocity
-       m yservo.write(180); 
+       serv.write(0); 
        
         //Turn off slip indicator
         digitalWrite(SLIP_LED_PIN, LOW);
@@ -56,7 +55,7 @@ void BCM::process(){
 //Update last update time
 float BCM::diff(){
     unsigned long currentTime = millis();
-    dt = (currentTime - lastUpdateTime) / 1000.0f; // convert ms to seconds
+    float dt = (currentTime - lastUpdateTime) / 1000.0f; // convert ms to seconds
     return dt;
 }
 
@@ -89,9 +88,9 @@ void BCM::txStatus(){
     } txData;
 
     // Populate and send TxData over serial
-    txData.imuAcc = bcm.imuAcc;
-    txData.wheelVel = bcm.wheelVel;
-    txData.wheelAcc = bcm.wheelAcc;
+    txData.imuAcc = imuAcc;
+    txData.wheelVel = wheelVel;
+    txData.wheelAcc = wheelAcc;
 
     Serial.write((uint8_t*)&txData, sizeof(txData));
 }

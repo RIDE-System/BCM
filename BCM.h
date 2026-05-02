@@ -11,7 +11,7 @@ class BCM {
     public:
         
         //Constructor
-        BCM::BCM();
+        BCM();
 
         // =========== Sensor Inputs ===========
         
@@ -42,8 +42,11 @@ class BCM {
         // IMU Acceleration
         float imuAcc;
 
+        //Servo 
+        Servo serv;  
+
         // Wheel Speed
-        float wheelVel;
+        float wheelVel, wheelAcc;
 
         //Last update
         unsigned long lastUpdateTime;
