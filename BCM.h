@@ -23,19 +23,22 @@ class BCM {
         // =====================================
 
         //Update sensor states
-        void update(float imua, float wvel){
-            imuAcc = imua;
-            wheelVel = wvel;
-
-            //Update time since last update
-            lastUpdateTime = millis();
-        }
+        void update();
 
         // Process
         void process();
 
         //Transmit status msg to debugger
         void txStatus();
+
+        // Slippage
+        bool isSlipping();
+
+        //Servo command functions
+        void enableIntervention();
+        void disableIntervention();
+        bool isLimiting();
+
 
     private:
 
@@ -44,6 +47,9 @@ class BCM {
 
         //Servo 
         Servo serv;  
+        bool enableServo;
+
+       
 
         //Servo incremental tracker
         float servoPos;
@@ -66,7 +72,7 @@ class BCM {
 
         //Return plausible max deceleration based on friction limits
         float getDecelLimit();
-        bool isSlipping();
+        
 
 
         

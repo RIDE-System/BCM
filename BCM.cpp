@@ -3,6 +3,8 @@
 
 #define SLIP_LED_PIN 1
 
+
+
 //Constructor
 BCM::BCM() {
     imuAcc = 0.0f;
@@ -13,6 +15,7 @@ BCM::BCM() {
     servoPos = 0.0f;
     trueVel = 0.0f;
     lastUpdateTime = millis();
+    enableServo = true;
 
     //Initialize slip indicator pin
     pinMode(SLIP_LED_PIN, OUTPUT);
@@ -22,6 +25,33 @@ BCM::BCM() {
     serv.write(0); 
 
     
+}
+
+void BCM::enableIntervention(){
+    //Enable the servo
+    enableServo = true;
+
+}
+
+void BCM::disableIntervention(){
+    //Disable the servo
+    enableServo = false;
+
+    //Clear any pending interventions
+    if(servoPos > 0){
+        servoPos = 0;
+        serv.write(servoPos);
+    }   
+}
+
+bool BCM::isLimiting(){
+    
+    //Return the status of the servo state
+    if(enableServo && servoPos > 0){
+        return true;
+    }
+
+    return false;
 }
 
 // Process
@@ -80,6 +110,19 @@ bool BCM::isSlipping(){
     }
 
     return false;
+}
+
+void BCM::update(){
+
+    // Simulate sensor updates (replace with actual sensor reads in real implementation)
+    imuAcc = random(-5, 5) / 10.0f; // Simulated IMU acceleration
+    wheelVel = random(0, 100) / 10.0f; // Simulated wheel velocity
+
+    //Update time since last update
+    lastUpdateTime = millis();
+
+    //Update last velocity
+    prev_wheelVel = wheelVel;
 }
 
 
